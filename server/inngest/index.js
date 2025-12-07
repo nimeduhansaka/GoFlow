@@ -21,19 +21,32 @@ const syncUserCreation = inngest.createFunction(
     }
 )
 
+
 //Inngest function to delete user from database
 const syncUserDeletion = inngest.createFunction(
     {id: 'delete-user-with-clerk'},
     {event: 'clerk/user.deleted'},
     async ( {event} ) => {
         const {data} = event
-        await prisma.user.delete({
-            where: {
-                id: data.id,
-            }
+
+        // Check if user exists before deleting
+        const existingUser = await prisma.user.findUnique({
+            where: { id: data.id }
         })
+
+        if (existingUser) {
+            await prisma.user.delete({
+                where: {
+                    id: data.id,
+                }
+            })
+        } else {
+            console.log(`User ${data.id} not found in database, skipping deletion`)
+        }
     }
 )
+
+
 
 //Inngest function to update user from database
 const syncUserUpdation = inngest.createFunction(
