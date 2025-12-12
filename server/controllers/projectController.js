@@ -38,6 +38,12 @@ export const createProject = async (req, res) => {
                 teamLead: teamLead?.id,
                 start_date: start_date ? new Date(start_date) : null,
                 end_date: end_date ? new Date(end_date) : null,
+                owner: {
+                    connect: { clerkUserId: userId }
+                },
+                workspace: {
+                    connect: { id: workspaceId }
+                }
             }
         })
 
